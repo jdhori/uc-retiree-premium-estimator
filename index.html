@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self';
+                 style-src 'self' https://fonts.googleapis.com;
+                 font-src https://fonts.gstatic.com;
+                 img-src 'self' data:;
+                 object-src 'none';
+                 base-uri 'self';
+                 frame-ancestors 'none';
+                 form-action 'self'">
+  <title>2026 UC Retiree Health Plan Premium Estimator</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <div class="uc-seal">UC</div>
+    <h1>
+      <span>University of California · 2026</span>
+      Retiree Health Plan Premium Estimator
+    </h1>
+  </div>
+</header>
+
+<!-- ── Tab navigation ──────────────────────────── -->
+<nav class="tab-bar" aria-label="Worksheet tabs">
+  <div class="tab-bar-inner">
+    <button class="tab-btn active" data-tab="tab-estimator">📋 Premium Estimator</button>
+    <button class="tab-btn" data-tab="tab-comparison">📊 Medical Plan Comparison</button>
+    <button class="tab-btn" data-tab="tab-g3">📐 Group 3 Contribution Table</button>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 1 — Premium Estimator
+══════════════════════════════════════════════ -->
+<div id="tab-estimator" class="tab-panel active">
+  <div class="tab-inner">
+
+    <!-- Left column: inputs -->
+    <div class="left-col">
+
+      <!-- Step 1: Eligibility Group -->
+      <div class="card">
+        <div class="card-header">
+          <div class="step-badge">1</div>
+          <h2>Eligibility Group</h2>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="group">When did the employee join UCRP?</label>
+            <select id="group">
+              <option value="">— Select —</option>
+              <option value="group1">Joined UCRP before 1/1/1990 (Group 1)</option>
+              <option value="group2">Joined UCRP 1/1/1990–6/30/2013 (Group 2)</option>
+              <option value="group3">Joined UCRP / rehired on or after 7/1/2013 (Group 3)</option>
+            </select>
+            <span class="hint">If rehired, use date you rejoined UCRP. Safety members: choose Group 2.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Age & Service -->
+      <div class="card">
+        <div class="card-header">
+          <div class="step-badge">2</div>
+          <h2>Age &amp; Service</h2>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="age">Age at Retirement (whole years)</label>
+            <input type="number" id="age" min="40" max="90" placeholder="e.g. 62">
+            <span class="hint" id="age-hint" style="display:none;"></span>
+          </div>
+          <div class="field">
+            <label for="service">Years of UCRP Service Credit</label>
+            <input type="number" id="service" min="0" max="50" placeholder="e.g. 20">
+            <span class="hint">Include sick leave (if any). Enter whole years.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: UC Contribution -->
+      <div class="card">
+        <div class="card-header">
+          <div class="step-badge">3</div>
+          <h2>UC Contribution</h2>
+        </div>
+        <div class="card-body">
+          <div class="contrib-display">
+            <div><div class="contrib-label">Calculated UC %</div></div>
+            <div class="contrib-value na" id="contrib-display">—</div>
+          </div>
+          <hr class="divider">
+          <div class="override-row">
+            <div class="field">
+              <label for="override-pct">Override % (optional)</label>
+              <input type="number" id="override-pct" min="0" max="100" step="0.01" placeholder="Enter % if known">
+            </div>
+            <span class="override-badge">Manual</span>
+          </div>
+          <span class="hint">If you already know your UC %, enter it here to override the calculated value.</span>
+        </div>
+      </div>
+
+      <!-- Step 4: Plan Selection -->
+      <div class="card">
+        <div class="card-header">
+          <div class="step-badge">4</div>
+          <h2>Plan Selection</h2>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="plan">Choose a Plan</label>
+            <select id="plan">
+              <option value="">— Select a plan —</option>
+              <optgroup label="Medical Plans">
+                <option value="UC Blue &amp; Gold HMO/UC Medicare Choice">UC Blue &amp; Gold HMO / UC Medicare Choice</option>
+                <option value="Kaiser Permanente/Senior Advantage HMO">Kaiser Permanente / Senior Advantage HMO</option>
+                <option value="HealthSavings+">HealthSavings+ (Blue Shield)</option>
+                <option value="UC Care PPO/UC Medicare PPO">UC Care PPO / UC Medicare PPO</option>
+                <option value="UC High Option PPO">UC High Option PPO</option>
+                <option value="UC Medicare PPO">UC Medicare PPO</option>
+                <option value="UC Medicare PPO without Rx">UC Medicare PPO without Rx</option>
+                <option value="UC Medicare Choice">UC Medicare Choice</option>
+              </optgroup>
+              <optgroup label="Dental Plans">
+                <option value="Delta Dental PPO">Delta Dental PPO</option>
+                <option value="DeltaCare USA (Dental HMO)">DeltaCare USA (Dental HMO)</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /left-col -->
+
+    <!-- Right column: results -->
+    <div class="results-panel">
+
+      <!-- Premium table -->
+      <div class="card">
+        <div class="card-header">
+          <h2 id="results-title">Premium Results</h2>
+        </div>
+        <div class="table-wrap" id="results-area">
+          <div class="placeholder-msg">
+            <div class="icon">📋</div>
+            <p>Complete the form on the left to see premium estimates.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coverage level key -->
+      <div class="card">
+        <div class="card-header"><h2>Coverage Level Key</h2></div>
+        <div class="card-body">
+          <div class="legend-grid">
+            <div class="legend-item"><strong>U</strong> — Retiree only</div>
+            <div class="legend-item"><strong>UC</strong> — Retiree + Child(ren)</div>
+            <div class="legend-item"><strong>UA</strong> — Retiree + Adult</div>
+            <div class="legend-item"><strong>UAC</strong> — Retiree + Adult + Child(ren)</div>
+            <div class="legend-item"><strong>M</strong> — Medicare-eligible Retiree</div>
+            <div class="legend-item"><strong>MM</strong> — M-eligible Retiree + M-eligible Adult/Child</div>
+            <div class="legend-item"><strong>MC</strong> — M-eligible Retiree + Child(ren) <em>or</em> Retiree + M-eligible Child</div>
+            <div class="legend-item"><strong>MA</strong> — M-eligible Retiree + Adult <em>or</em> Retiree + M-eligible Adult</div>
+            <div class="legend-item"><strong>MAC</strong> — Mixed Medicare/non-Medicare + Adult + Child</div>
+            <div class="legend-item"><strong>MMM</strong> — M-eligible Retiree + M-eligible Adult + M-eligible Child</div>
+            <div class="legend-item"><strong>MMC</strong> — M-eligible Retiree + M-eligible Adult + Child, or similar</div>
+          </div>
+          <div class="hint" style="margin-top:4px;">
+            <strong>Medicare Part B Reimbursement:</strong> When UC's contribution exceeds the plan premium,
+            eligible Medicare retirees may receive up to $185/person/month toward Medicare Part B costs.
+          </div>
+        </div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer">
+        <strong>Disclaimer:</strong> Planning purposes only. Does not include rates for retirees 65+ without
+        Medicare, union rates, disability rates, Via Benefits, postdoctoral scholars, interns/residents, or
+        students. Not a guaranteed rate. See
+        <a href="https://ucnet.universityofcalifornia.edu" target="_blank" rel="noopener noreferrer">UCnet</a>
+        for vision plan premiums and official rates.
+      </div>
+
+    </div><!-- /results-panel -->
+
+  </div><!-- /tab-inner -->
+</div><!-- /tab-estimator -->
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 2 — Medical Plan Comparison Chart
+══════════════════════════════════════════════ -->
+<div id="tab-comparison" class="tab-panel">
+  <div class="tab-inner">
+
+    <div class="comp-meta">
+      <h2>2026 Medical Plan Comparison — Net Monthly Premiums</h2>
+      <div class="contrib-pill">
+        <span>UC Contribution: </span><span id="comp-pct-label">—</span>
+      </div>
+      <span class="hint" style="font-style:normal;">← Set eligibility inputs on the Estimator tab to update.</span>
+    </div>
+
+    <div class="comp-wrap">
+      <table class="comp-tbl">
+        <thead>
+          <tr>
+            <th rowspan="2" style="text-align:left;vertical-align:middle;padding:11px 14px;">
+              Coverage<br>Level
+            </th>
+            <th colspan="2">
+              UC Blue &amp; Gold HMO /<br>UC Medicare Choice
+              <br><span class="plan-badge">HMO / Medicare Adv. PPO</span>
+            </th>
+            <th colspan="2">
+              Kaiser Permanente /<br>Senior Advantage
+              <br><span class="plan-badge">HMO / Medicare Adv. HMO</span>
+            </th>
+            <th colspan="2">
+              HealthSavings+<br>(Blue Shield)
+              <br><span class="plan-badge">PPO with HSA</span>
+            </th>
+            <th colspan="2">
+              UC Care PPO /<br>UC Medicare PPO
+              <br><span class="plan-badge">PPO / Medicare Supp. PPO</span>
+            </th>
+            <th colspan="2">
+              UC High Option<br>(Anthem)
+              <br><span class="plan-badge">Medicare Supp. PPO</span>
+            </th>
+            <th colspan="2">
+              UC Medicare PPO<br>(Anthem)
+              <br><span class="plan-badge">Medicare Supp. PPO</span>
+            </th>
+            <th colspan="2">
+              UC Medicare PPO<br>without Rx
+              <br><span class="plan-badge">Medicare Supp. PPO</span>
+            </th>
+            <th colspan="2">
+              UC Medicare Choice<br>(UnitedHealthcare)
+              <br><span class="plan-badge">Medicare Adv. PPO</span>
+            </th>
+          </tr>
+          <tr>
+            <th>Net Premium</th><th>Part B Reimb.</th>
+            <th>Net Premium</th><th>Part B Reimb.</th>
+            <th>Net Premium</th><th>Part B Reimb.</th>
+            <th>Net Premium</th><th>Part B Reimb.</th>
+            <th>Net Premium</th><th>Part B Reimb.</th>
+            <th>Net Premium</th><th>Part B Reimb.</th>
+            <th>Net Premium</th><th>Part B Reimb.</th>
+            <th>Net Premium</th><th>Part B Reimb.</th>
+          </tr>
+        </thead>
+        <tbody id="comp-tbody">
+          <tr>
+            <td colspan="17" style="padding:32px;text-align:center;color:var(--text-muted);font-size:13px;">
+              Set your eligibility inputs on the Estimator tab to populate this chart.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Net Monthly Premium</strong> = amount retiree pays after UC's contribution is applied.
+      <strong>$0.00</strong> (shown in green) means UC fully covers the premium.
+      <strong>Part B Reimbursement</strong> = if UC's contribution exceeds the plan cost, eligible Medicare
+      members may receive the surplus (up to $185/person/month) toward Medicare Part B premiums.
+      N/A = plan not available for that coverage combination.
+    </div>
+
+  </div>
+</div><!-- /tab-comparison -->
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 3 — Group 3 Contribution Reference Table
+══════════════════════════════════════════════ -->
+<div id="tab-g3" class="tab-panel">
+  <div class="tab-inner">
+
+    <div class="g3-intro">
+      <h3>Group 3 — UC Contribution Percentage Lookup Table</h3>
+      <p>
+        For employees who joined UCRP or were rehired on or after July 1, 2013 (Eligibility Group 3),
+        the UC contribution percentage is determined by <strong>age at retirement</strong> (columns) and
+        <strong>years of UCRP service credit</strong> (rows). The percentage shown is the portion of the
+        <em>maximum</em> UC contribution that UC will pay toward your health premiums. Service credit is
+        capped at 20 years; age is capped at 65. Minimum eligibility requires at least 10 years of service
+        and age 50 or older.
+      </p>
+    </div>
+
+    <div class="g3-ctrl">
+      <span style="font-size:13px;color:var(--text-muted);">Highlight a cell:</span>
+      <label>
+        Service credit:
+        <input type="number" id="g3-svc" min="10" max="20" placeholder="10–20">
+      </label>
+      <label>
+        Age:
+        <input type="number" id="g3-age" min="50" max="65" placeholder="50–65">
+      </label>
+      <button class="g3-btn" id="g3-btn">Highlight</button>
+    </div>
+
+    <div class="g3-wrap" id="g3-table-container"></div>
+
+    <div class="g3-note">
+      <strong>Notes:</strong> A dash (—) indicates 0% UC contribution — the retiree does not yet qualify
+      at that age/service combination. Green cells indicate 100% of the maximum UC contribution. The
+      highlighted cell (navy/gold) shows the intersection of your entered service credit and age.
+      Age and service credit entered on the Estimator tab are automatically synced here.
+    </div>
+
+  </div>
+</div><!-- /tab-g3 -->
+
+
+<script src="app.js"></script>
+</body>
+</html>
