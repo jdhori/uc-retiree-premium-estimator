@@ -244,6 +244,38 @@ function makeCovCell(level) {
   return wrapper;
 }
 
+/**
+ * Builds a small inline value-sign icon that references one of the hidden
+ * SVG symbols defined at the top of index.html. `kind` must be 'no' (red,
+ * Drake "No") or 'yes' (green, Drake "Yes"). The label text ("Negative Value"
+ * / "Positive Value") is placed in a tooltip span that stays hidden until the
+ * user hovers or focuses the icon.
+ */
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function makeValueIcon(kind) {
+  const label = kind === 'no' ? 'Negative Value' : 'Positive Value';
+  const wrap  = el('span', {
+    cls:   `value-icon value-${kind}`,
+    attrs: { tabindex: '0', role: 'img', 'aria-label': label },
+  });
+
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 48 48');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+
+  const use = document.createElementNS(SVG_NS, 'use');
+  use.setAttribute('href', `#icon-drake-${kind}`);
+  svg.appendChild(use);
+
+  const tip = el('span', { cls: 'value-tip', text: label, attrs: { role: 'tooltip' } });
+
+  wrap.appendChild(svg);
+  wrap.appendChild(tip);
+  return wrap;
+}
+
 /** Builds a placeholder message node (emoji icon + descriptive text). */
 function makePlaceholder(icon, message) {
   const wrap = el('div', { cls: 'placeholder-msg' });
@@ -467,9 +499,18 @@ function renderEstimator() {
       row.appendChild(el('td', { cls: 'amount',           text: fmt(r.total) }));
       row.appendChild(el('td', { cls: 'amount',           text: fmt(r.maxUC) }));
       row.appendChild(el('td', { cls: 'amount uc-pays',   text: fmt(r.ucPays) }));
-      row.appendChild(el('td', { cls: 'amount retiree-pays',
-                                 text: r.retiree <= 0 ? '$0.00' : fmt(r.retiree) }));
-      row.appendChild(el('td', { cls: 'amount partb',     text: r.partB ? fmt(r.partB) : '—' }));
+
+      // You Pay — red, append Negative Value icon when retiree owes > 0
+      const payTd = el('td', { cls: 'amount retiree-pays' });
+      payTd.appendChild(document.createTextNode(r.retiree <= 0 ? '$0.00' : fmt(r.retiree)));
+      if (r.retiree > 0) payTd.appendChild(makeValueIcon('no'));
+      row.appendChild(payTd);
+
+      // Part B Reimb — green, append Positive Value icon when reimbursement exists
+      const partbTd = el('td', { cls: 'amount partb' });
+      partbTd.appendChild(document.createTextNode(r.partB ? fmt(r.partB) : '—'));
+      if (r.partB) partbTd.appendChild(makeValueIcon('yes'));
+      row.appendChild(partbTd);
     }
 
     tbody.appendChild(row);
@@ -519,7 +560,11 @@ function renderComparison() {
           cls:  r.retiree <= 0 ? 'net zero grp-sep' : 'net grp-sep',
           text: r.retiree <= 0 ? '$0.00' : fmt(r.retiree),
         }));
-        row.appendChild(el('td', { cls: 'pbv', text: r.partB ? fmt(r.partB) : '—' }));
+        // Part B Reimb — green, append Positive Value icon when reimbursement exists
+        const pbvTd = el('td', { cls: 'pbv' });
+        pbvTd.appendChild(document.createTextNode(r.partB ? fmt(r.partB) : '—'));
+        if (r.partB) pbvTd.appendChild(makeValueIcon('yes'));
+        row.appendChild(pbvTd);
       }
     }
 
