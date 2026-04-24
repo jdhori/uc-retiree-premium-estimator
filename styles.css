@@ -373,11 +373,23 @@ td:first-child {
   text-align: left;
 }
 
-.amount { color: var(--text); }
+.amount { color: var(--text); white-space: nowrap; }
 .amount.uc-pays { color: var(--navy); font-weight: 600; }
 .amount.retiree-pays { color: var(--red); font-weight: 600; }
 .amount.partb { color: var(--green); font-weight: 600; }
 .na-cell { color: var(--mid-gray); font-size: 12px; }
+
+/* Keep the number and its value-icon from breaking onto separate lines. */
+.amount.retiree-pays,
+.amount.partb,
+.comp-tbl td.net,
+.comp-tbl td.pbv {
+  white-space: nowrap;
+}
+
+.value-icon {
+  white-space: nowrap;
+}
 
 /* ── Coverage level tooltip ───────────────────── */
 .cov-cell {
