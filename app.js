@@ -254,7 +254,7 @@ function makeCovCell(level) {
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 function makeValueIcon(kind) {
-  const label = kind === 'no' ? 'Negative Value' : 'Positive Value';
+  const label = kind === 'no' ? 'You Pay' : "You're Reimbursed";
   const wrap  = el('span', {
     cls:   `value-icon value-${kind}`,
     attrs: { tabindex: '0', role: 'img', 'aria-label': label },
@@ -472,7 +472,7 @@ function renderEstimator() {
   const hdr   = document.createElement('tr');
 
   ['Coverage Level', 'Total Premium', 'Max UC Contrib.', 'UC Pays', 'You Pay', 'Part B Reimb.'].forEach(text => {
-    hdr.appendChild(el('th', { text }));
+    hdr.appendChild(el('th', { text, attrs: { scope: 'col' } }));
   });
   thead.appendChild(hdr);
   table.appendChild(thead);
@@ -483,10 +483,10 @@ function renderEstimator() {
     const r   = calcRow(plan, lv, ucPct);
     const row = document.createElement('tr');
 
-    // Coverage level cell
-    const firstTd = document.createElement('td');
-    firstTd.appendChild(makeCovCell(lv));
-    row.appendChild(firstTd);
+    // Coverage level header cell (th, scope=row)
+    const firstTh = el('th', { cls: 'cov-head', attrs: { scope: 'row' } });
+    firstTh.appendChild(makeCovCell(lv));
+    row.appendChild(firstTh);
 
     if (!r) {
       row.classList.add('na-row');
@@ -547,9 +547,9 @@ function renderComparison() {
     const row     = document.createElement('tr');
     if (!results.some(r => r !== null)) row.classList.add('na-row');
 
-    const firstTd = document.createElement('td');
-    firstTd.appendChild(makeCovCell(lv));
-    row.appendChild(firstTd);
+    const firstTh = el('th', { cls: 'cov-head', attrs: { scope: 'row' } });
+    firstTh.appendChild(makeCovCell(lv));
+    row.appendChild(firstTh);
 
     for (const r of results) {
       if (!r) {

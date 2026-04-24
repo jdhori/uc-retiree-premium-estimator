@@ -363,13 +363,20 @@ tbody tr.na-row {
   opacity: 0.38;
 }
 
-td {
+td,
+tbody th {
   padding: 9px 12px;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-td:first-child {
+/* Row-header cells (<th scope="row">) and first column cells left-align. */
+tbody th[scope="row"] {
+  font-weight: 400;
+  text-align: left;
+}
+
+tbody tr > :first-child {
   text-align: left;
 }
 
@@ -676,7 +683,8 @@ tr:not(.na-row) .cov-info-btn {
   opacity: 0.35;
 }
 
-.comp-tbl td {
+.comp-tbl td,
+.comp-tbl tbody th {
   padding: 8px 9px;
   text-align: center;
   font-variant-numeric: tabular-nums;
@@ -684,7 +692,13 @@ tr:not(.na-row) .cov-info-btn {
   font-size: 12px;
 }
 
-.comp-tbl td:first-child {
+.comp-tbl tbody th[scope="row"] {
+  font-weight: 400;
+  text-align: left;
+  border-right: 2px solid var(--border);
+}
+
+.comp-tbl tbody tr > :first-child {
   text-align: left;
   border-right: 2px solid var(--border);
 }
