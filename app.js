@@ -133,9 +133,9 @@ const COV_DESCS = {
   MM:  "M-eligible Retiree + M-eligible Adult or Child",
   MC:  "M-eligible Retiree + Child(ren), or Retiree + M-eligible Child",
   MA:  "M-eligible Retiree + Adult, or Retiree + M-eligible Adult",
-  MAC: "Mixed Medicare/non-Medicare + Adult + Child",
+  MAC: "M-eligible Retiree + Adult + Child(ren) OR Retiree + M-eligible Adult + Child(ren) OR Retiree + Adult + M-eligible Child",
   MMM: "M-eligible Retiree + M-eligible Adult + M-eligible Child",
-  MMC: "M-eligible Retiree + M-eligible Adult + Child, or similar",
+  MMC: "MMC = Medicare-eligible Retiree + Medicare-eligible Adult + Child(ren) OR M-eligible Retiree + Adult + M-eligible Child",
 };
 
 // Medicare Part B reimbursement: number of covered persons per level
@@ -259,7 +259,18 @@ function makePlaceholder(icon, message) {
 
 /** Returns UC contribution as a decimal (0–1), or null if ineligible. */
 function calcUCPct(group, age, service) {
-  if (group === 'group1') return 1.0;
+  if (group === 'group1') {
+    // Group 1 eligibility:
+    //   Age 50–54: at least 10 years of UCRP service credit required
+    //   Age 55+:   at least 5 years of UCRP service credit required
+    // If eligible, UC pays 100% of the max contribution.
+    if (isNaN(age) || isNaN(service)) return null;
+    const svc = Math.floor(service);
+    if (age < 50) return null;
+    if (age >= 55 && svc >= 5)  return 1.0;
+    if (age >= 50 && svc >= 10) return 1.0;
+    return null;
+  }
 
   if (group === 'group2') {
     const svc = Math.floor(service);
@@ -294,13 +305,13 @@ function calcUCPct(group, age, service) {
 
 /**
  * Returns true when the age field is needed to compute the UC contribution.
- *   Group 1 — never needed (always 100%).
- *   Group 2 — only needed when service < 10 (Rule 75 eligibility check).
+ *   Group 1 — always needed (age determines service-credit eligibility threshold).
+ *   Group 2 — only needed when service is entered AND is < 10 (Rule 75 check).
  *   Group 3 — always needed (age × service lookup table).
  */
 function ageIsRequired(group, service) {
-  if (group === 'group1') return false;
-  if (group === 'group2') return isNaN(service) || Math.floor(service) < 10;
+  if (group === 'group1') return true;
+  if (group === 'group2') return !isNaN(service) && Math.floor(service) < 10;
   if (group === 'group3') return true;
   return false;
 }
@@ -337,7 +348,9 @@ function getActivePct() {
   const a = parseFloat(document.getElementById('age').value);
 
   if (!g || isNaN(s)) return null;
-  if (g === 'group1') return 1.0;
+
+  // Group 1 now requires age (age determines service-credit threshold).
+  if (g === 'group1') return !isNaN(a) ? calcUCPct(g, a, s) : null;
 
   // Group 2 with service ≥ 10: age is not needed, proceed without it.
   if (g === 'group2' && Math.floor(s) >= 10) return calcUCPct(g, a, s);
@@ -351,9 +364,15 @@ function fmt(v) {
   return '$' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-/** Formats a decimal fraction as a percentage string, e.g. "75%". */
+/**
+ * Formats a decimal fraction as a percentage string, preserving fractional
+ * precision (so 0.385 renders as "38.5%", not "39%"). Whole-number
+ * percentages drop their decimal (so 0.75 renders as "75%", not "75.0%").
+ */
 function pctStr(v) {
-  return Math.round(v * 100) + '%';
+  const pct = v * 100;
+  // Show up to 2 decimal places, then trim trailing zeros and a trailing dot.
+  return pct.toFixed(2).replace(/\.?0+$/, '') + '%';
 }
 
 
@@ -373,7 +392,7 @@ function renderEstimator() {
   ageField.style.opacity = needAge ? '1' : '0.45';
 
   if (g === 'group1') {
-    ageHint.textContent = 'Not required — Group 1 members always receive 100% UC contribution.';
+    ageHint.textContent = 'Required — Group 1 eligibility: age 50–54 needs 10+ years of service; age 55+ needs 5+ years. Eligible retirees receive 100% UC contribution.';
     ageHint.style.display = 'block';
   } else if (g === 'group2' && !needAge) {
     ageHint.textContent = 'Not required — with 10+ years of service, contribution is based on service credit alone.';
@@ -512,57 +531,18 @@ function renderComparison() {
 
 
 /* ════════════════════════════════════════════════
-   TAB 3 — GROUP 3 REFERENCE TABLE
+   TAB 3 — VISION, LEGAL PREMIUMS
    ════════════════════════════════════════════════ */
 
-function renderG3() {
-  const hlS  = parseInt(document.getElementById('g3-svc').value) || null;
-  const hlA  = parseInt(document.getElementById('g3-age').value) || null;
-  const capS = hlS ? Math.min(Math.max(hlS, 10), 20) : null;
-  const capA = hlA ? Math.min(Math.max(hlA, 50), 65) : null;
-
-  const table  = el('table', { cls: 'g3-tbl' });
-  const thead  = document.createElement('thead');
-  const hdrRow = document.createElement('tr');
-
-  // Corner header cell (service credit label with line break)
-  const cornerTh = el('th', { cls: 'rh' });
-  cornerTh.appendChild(document.createTextNode('Service Credit'));
-  cornerTh.appendChild(document.createElement('br'));
-  cornerTh.appendChild(el('span', {
-    text:  '↓ years at retirement',
-    attrs: { style: 'font-weight:400;opacity:0.75;font-size:10px;' },
-  }));
-  hdrRow.appendChild(cornerTh);
-
-  for (const age of G3_AGES) {
-    hdrRow.appendChild(el('th', { cls: 'ah', text: String(age) }));
-  }
-
-  thead.appendChild(hdrRow);
-  table.appendChild(thead);
-
-  const tbody = document.createElement('tbody');
-
-  for (let si = 0; si < G3_SVCS.length; si++) {
-    const svc   = G3_SVCS[si];
-    const rowHL = (capS === svc);
-    const row   = document.createElement('tr');
-
-    row.appendChild(el('td', { text: `${svc} yr${svc !== 1 ? 's' : ''}` }));
-
-    for (let ai = 0; ai < G3_AGES.length; ai++) {
-      const val  = G3_DATA[si][ai];
-      const isHL = rowHL && (capA === G3_AGES[ai]);
-      const cls  = isHL ? 'g3-hl' : (val === 0 ? 'zp' : val === 1 ? 'fp' : 'pp');
-      row.appendChild(el('td', { cls, text: val === 0 ? '—' : Math.round(val * 100) + '%' }));
-    }
-
-    tbody.appendChild(row);
-  }
-
-  table.appendChild(tbody);
-  replaceChildren(document.getElementById('g3-table-container'), table);
+/**
+ * Renders the Vision & Legal Premiums tab. Premium rate data is not yet
+ * wired in; this keeps the tab label/header/structure intact and updates
+ * the shared UC-contribution pill so the tab is ready to be populated.
+ */
+function renderVisionLegal() {
+  const ucPct = getActivePct();
+  const pill  = document.getElementById('vl-pct-label');
+  if (pill) pill.textContent = ucPct !== null ? pctStr(ucPct) : '—';
 }
 
 
@@ -589,22 +569,9 @@ function initTabs() {
 function initEvents() {
   ['group', 'age', 'service', 'plan', 'override-pct'].forEach(id => {
     const node = document.getElementById(id);
-    node.addEventListener('input',  renderEstimator);
-    node.addEventListener('change', renderEstimator);
+    node.addEventListener('input',  () => { renderEstimator(); renderVisionLegal(); });
+    node.addEventListener('change', () => { renderEstimator(); renderVisionLegal(); });
   });
-
-  // Sync age/service into the G3 highlight fields when in valid G3 range
-  document.getElementById('age').addEventListener('input', e => {
-    const v = parseInt(e.target.value);
-    if (!isNaN(v) && v >= 50 && v <= 65) document.getElementById('g3-age').value = v;
-  });
-
-  document.getElementById('service').addEventListener('input', e => {
-    const v = parseInt(e.target.value);
-    if (!isNaN(v) && v >= 10 && v <= 20) document.getElementById('g3-svc').value = v;
-  });
-
-  document.getElementById('g3-btn').addEventListener('click', renderG3);
 }
 
 
@@ -615,6 +582,6 @@ function initEvents() {
 document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initEvents();
-  renderG3();
+  renderVisionLegal();
   renderEstimator();
 });

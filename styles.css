@@ -9,6 +9,7 @@
   --text: #1A1814;
   --text-muted: #6B6558;
   --green: #2D7D46;
+  --red:   #C62828;
   --border: #DDD8CE;
   --shadow: 0 2px 12px rgba(0, 50, 98, 0.10);
 }
@@ -373,9 +374,9 @@ td:first-child {
 }
 
 .amount { color: var(--text); }
-.amount.uc-pays { color: var(--green); font-weight: 600; }
-.amount.retiree-pays { color: var(--navy); font-weight: 600; }
-.amount.partb { color: var(--text-muted); font-style: italic; }
+.amount.uc-pays { color: var(--navy); font-weight: 600; }
+.amount.retiree-pays { color: var(--red); font-weight: 600; }
+.amount.partb { color: var(--green); font-weight: 600; }
 .na-cell { color: var(--mid-gray); font-size: 12px; }
 
 /* ── Coverage level tooltip ───────────────────── */
@@ -619,8 +620,8 @@ tr:not(.na-row) .cov-info-btn {
 
 .comp-tbl td.grp-sep { border-right: 2px solid var(--border); }
 .comp-tbl td.net { font-weight: 600; color: var(--navy); }
-.comp-tbl td.net.zero { color: var(--green); }
-.comp-tbl td.pbv { color: var(--text-muted); font-style: italic; font-size: 11px; }
+.comp-tbl td.net.zero { color: var(--navy); }
+.comp-tbl td.pbv { color: var(--green); font-weight: 600; font-size: 11px; }
 .comp-tbl td.nav { color: var(--mid-gray); font-size: 11px; }
 
 .plan-badge {

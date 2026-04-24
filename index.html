@@ -33,9 +33,9 @@
 <!-- ── Tab navigation ──────────────────────────── -->
 <nav class="tab-bar" aria-label="Worksheet tabs">
   <div class="tab-bar-inner">
-    <button class="tab-btn active" data-tab="tab-estimator">📋 Premium Estimator</button>
+    <button class="tab-btn active" data-tab="tab-estimator">📋 Medical, Dental Premiums</button>
     <button class="tab-btn" data-tab="tab-comparison">📊 Medical Plan Comparison</button>
-    <button class="tab-btn" data-tab="tab-g3">📐 Group 3 Contribution Table</button>
+    <button class="tab-btn" data-tab="tab-vl">👓 Vision, Legal Premiums</button>
   </div>
 </nav>
 
@@ -126,7 +126,7 @@
               <optgroup label="Medical Plans">
                 <option value="UC Blue &amp; Gold HMO/UC Medicare Choice">UC Blue &amp; Gold HMO / UC Medicare Choice</option>
                 <option value="Kaiser Permanente/Senior Advantage HMO">Kaiser Permanente / Senior Advantage HMO</option>
-                <option value="HealthSavings+">HealthSavings+ (Blue Shield)</option>
+                <option value="HealthSavings+">HealthSavings+</option>
                 <option value="UC Care PPO/UC Medicare PPO">UC Care PPO / UC Medicare PPO</option>
                 <option value="UC High Option PPO">UC High Option PPO</option>
                 <option value="UC Medicare PPO">UC Medicare PPO</option>
@@ -173,9 +173,9 @@
             <div class="legend-item"><strong>MM</strong> — M-eligible Retiree + M-eligible Adult/Child</div>
             <div class="legend-item"><strong>MC</strong> — M-eligible Retiree + Child(ren) <em>or</em> Retiree + M-eligible Child</div>
             <div class="legend-item"><strong>MA</strong> — M-eligible Retiree + Adult <em>or</em> Retiree + M-eligible Adult</div>
-            <div class="legend-item"><strong>MAC</strong> — Mixed Medicare/non-Medicare + Adult + Child</div>
+            <div class="legend-item"><strong>MAC</strong> — M-eligible Retiree + Adult + Child(ren) <em>or</em> Retiree + M-eligible Adult + Child(ren) <em>or</em> Retiree + Adult + M-eligible Child</div>
             <div class="legend-item"><strong>MMM</strong> — M-eligible Retiree + M-eligible Adult + M-eligible Child</div>
-            <div class="legend-item"><strong>MMC</strong> — M-eligible Retiree + M-eligible Adult + Child, or similar</div>
+            <div class="legend-item"><strong>MMC</strong> — M-eligible Retiree + M-eligible Adult + Child(ren) <em>or</em> M-eligible Retiree + Adult + M-eligible Child</div>
           </div>
           <div class="hint" style="margin-top:4px;">
             <strong>Medicare Part B Reimbursement:</strong> When UC's contribution exceeds the plan premium,
@@ -287,47 +287,48 @@
 
 
 <!-- ══════════════════════════════════════════════
-     TAB 3 — Group 3 Contribution Reference Table
+     TAB 3 — Vision, Legal Premiums
 ══════════════════════════════════════════════ -->
-<div id="tab-g3" class="tab-panel">
+<div id="tab-vl" class="tab-panel">
   <div class="tab-inner">
 
-    <div class="g3-intro">
-      <h3>Group 3 — UC Contribution Percentage Lookup Table</h3>
-      <p>
-        For employees who joined UCRP or were rehired on or after July 1, 2013 (Eligibility Group 3),
-        the UC contribution percentage is determined by <strong>age at retirement</strong> (columns) and
-        <strong>years of UCRP service credit</strong> (rows). The percentage shown is the portion of the
-        <em>maximum</em> UC contribution that UC will pay toward your health premiums. Service credit is
-        capped at 20 years; age is capped at 65. Minimum eligibility requires at least 10 years of service
-        and age 50 or older.
-      </p>
+    <div class="comp-meta">
+      <h2>2026 Vision &amp; Legal Plan Premiums</h2>
+      <div class="contrib-pill">
+        <span>UC Contribution: </span><span id="vl-pct-label">—</span>
+      </div>
+      <span class="hint" style="font-style:normal;">← Set eligibility inputs on the Medical, Dental Premiums tab to update.</span>
     </div>
 
-    <div class="g3-ctrl">
-      <span style="font-size:13px;color:var(--text-muted);">Highlight a cell:</span>
-      <label>
-        Service credit:
-        <input type="number" id="g3-svc" min="10" max="20" placeholder="10–20">
-      </label>
-      <label>
-        Age:
-        <input type="number" id="g3-age" min="50" max="65" placeholder="50–65">
-      </label>
-      <button class="g3-btn" id="g3-btn">Highlight</button>
+    <div class="card">
+      <div class="card-header"><h2>Vision Plan</h2></div>
+      <div class="table-wrap" id="vision-area">
+        <div class="placeholder-msg">
+          <div class="icon">👓</div>
+          <p>Vision plan premium rates will appear here. (Rates pending — drop in the numbers from the original spreadsheet to populate this table.)</p>
+        </div>
+      </div>
     </div>
 
-    <div class="g3-wrap" id="g3-table-container"></div>
+    <div class="card">
+      <div class="card-header"><h2>Legal Plan</h2></div>
+      <div class="table-wrap" id="legal-area">
+        <div class="placeholder-msg">
+          <div class="icon">⚖️</div>
+          <p>Legal plan premium rates will appear here. (Rates pending — drop in the numbers from the original spreadsheet to populate this table.)</p>
+        </div>
+      </div>
+    </div>
 
-    <div class="g3-note">
-      <strong>Notes:</strong> A dash (—) indicates 0% UC contribution — the retiree does not yet qualify
-      at that age/service combination. Green cells indicate 100% of the maximum UC contribution. The
-      highlighted cell (navy/gold) shows the intersection of your entered service credit and age.
-      Age and service credit entered on the Estimator tab are automatically synced here.
+    <div class="disclaimer">
+      <strong>Note:</strong> Vision and Legal plan rates are pending. Once populated, this tab will display
+      total premium, UC contribution, and retiree net premium for every coverage level, mirroring the Medical,
+      Dental Premiums tab. See <a href="https://ucnet.universityofcalifornia.edu" target="_blank" rel="noopener noreferrer">UCnet</a>
+      for official vision plan premiums in the meantime.
     </div>
 
   </div>
-</div><!-- /tab-g3 -->
+</div><!-- /tab-vl -->
 
 
 <script src="app.js"></script>
